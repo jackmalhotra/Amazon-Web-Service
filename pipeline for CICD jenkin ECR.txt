@@ -1,0 +1,62 @@
+	pipeline {
+		agent any
+		tools {
+			maven '3.9.8'
+		}
+		
+		environment {
+			//DOCKER_IMAGE = 'springboot_app'  // Docker Hub repository name
+			WORKSPACE = '/var/lib/jenkins/workspace/SpringBoot-CICD/'
+			AWS_ACCOUNT_ID = '730335202615'
+			AWS_DEFAULT_REGION = 'ap-south-1'
+			IMAGE_REPO_NAME = 'ecr-springboot'
+			IMAGE_TAG = 'latest'
+			REPOSITORY_URI = "730335202615.dkr.ecr.ap-south-1.amazonaws.com/${IMAGE_REPO_NAME}"
+		}
+
+		stages {
+			stage('1. Code Checkout and Build') {
+				steps {
+					echo "Checking out code and building Maven project"
+					git url: "https://github.com/jackmalhotra/SpringDemo.git", branch: "master"
+					sh "mvn clean install"
+				}
+			}
+			
+			stage('2. Build Docker Image') {
+				steps {
+					echo "Building Docker image"
+					dir("${WORKSPACE}") {
+						sh "docker build -t ${REPOSITORY_URI}:${IMAGE_TAG} ."
+					}
+				}
+			}
+			
+			
+			stage('3. AWS ECR Login') {
+				steps {
+					script {
+						sh """aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"""
+					}
+				}
+			}
+			
+			stage('4. Build and Push to AWS ECR') {
+				steps {
+					echo 'pushing Docker image to AWS ECR...'
+					script {
+						sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
+					}
+				}
+			}
+		}
+
+		post {
+			success {
+				echo 'Pipeline succeeded! Docker image pushed to ECR Repository.'
+			}
+			failure {
+				echo 'Pipeline failed. Deployment unsuccessful.'
+			}
+		}
+	}

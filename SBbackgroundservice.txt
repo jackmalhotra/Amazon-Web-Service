@@ -1,0 +1,41 @@
+################ Executing spring boot application as background service Ubuntu ################
+<build>
+	<plugins>
+		<plugin>
+			<configuration>
+				<executable>true</executable>
+			</configuration>
+		</plugin>
+	</plugins>
+</build>
+
+
+sudo vim /etc/systemd/system/SpringbootApp-0.0.1-SNAPSHOT.service
+
+[Unit]
+Description=Spring Boot Application
+After=syslog.target
+
+[Service]
+Environment="JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64"
+User=ubuntu
+ExecStart=/home/ubuntu/Springboot_Ui/target/SpringbootApp-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl enable SpringbootApp-0.0.1-SNAPSHOT
+sudo systemctl start SpringbootApp-0.0.1-SNAPSHOT
+sudo systemctl status SpringbootApp-0.0.1-SNAPSHOT
+sudo systemctl stop SpringbootApp-0.0.1-SNAPSHOT
+
+sudo systemctl daemon-reload
+sudo systemctl restart SpringbootApp-0.0.1-SNAPSHOT.service
+sudo systemctl restart SpringbootApp-0.0.1-SNAPSHOT
+
+
+sudo chmod 777 /home/ubuntu/Springboot_Ui/target/SpringbootApp-0.0.1-SNAPSHOT.jar

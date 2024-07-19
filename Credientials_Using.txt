@@ -1,0 +1,23 @@
+********* Aws RDS ************
+Username : rocky
+Password : Rocky123
+
+********* Jenkins ************
+Username : admin-jenkins
+Password: Rocky123
+
+********* Docker Hub ***********
+Username : arjuncdockerhub
+Password : Demo@0007
+
+tomcat local : port : 8080
+jenkins local : port :8085
+
+
+
+
+
+
+
+
+

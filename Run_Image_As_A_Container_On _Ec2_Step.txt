@@ -1,0 +1,52 @@
+********* Run image as a Container on Ec2 Steps****************
+
+After Images deployed to DockerHub
+1. Go to EC2
+2. Change sock permission : ubuntu@ip-172-31-41-95:~$ sudo chmod 777 /var/run/docker.sock
+3. sudo docker login
+	username : dockerHub username
+	password : dockerHub password
+
+4. pull docker images from dockerHub
+ubuntu@ip-172-31-41-95:~$ docker pull arjuncdockerhub/springboot_app:latest
+latest: Pulling from arjuncdockerhub/springboot_app
+5843afab3874: Pull complete
+53c9466125e4: Pull complete
+d8d715783b80: Pull complete
+3ecb6d28b299: Pull complete
+Digest: sha256:439519e7dc343fd6fa898e0fcf21302a259c7e3f55f41fa77556bccf87c1232a
+Status: Downloaded newer image for arjuncdockerhub/springboot_app:latest
+docker.io/arjuncdockerhub/springboot_app:latest
+
+5. Run images as a container 
+ubuntu@ip-172-31-41-95:~$ docker run --name spring -d -P arjuncdockerhub/springboot_app
+55d19c527df6008dcceb1e3cf047b0352104c2a913a7b331645a3a576a1d2b98
+
+********** Command to monitor Container and Images and Processes *******************
+
+1. ubuntu@ip-172-31-41-95:~$ docker container ls
+CONTAINER ID   IMAGE                            COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+55d19c527df6   arjuncdockerhub/springboot_app   "java -jar /spring-b…"   13 minutes ago   Up 13 minutes   0.0.0.0:32771->9095/tcp, :::32771->9095/tcp   spring
+
+In Web Browser URL : public_IP:32771
+Your Application will run
+
+2. ubuntu@ip-172-31-41-95:~$ docker images
+REPOSITORY                       TAG       IMAGE ID       CREATED          SIZE
+arjuncdockerhub/springboot_app   latest    be3be60d3827   16 minutes ago   366MB
+
+
+3. ubuntu@ip-172-31-41-95:~$ docker ps -a
+CONTAINER ID   IMAGE                            COMMAND                  CREATED         STATUS         PORTS                                         NAMES
+55d19c527df6   arjuncdockerhub/springboot_app   "java -jar /spring-b…"   3 seconds ago   Up 3 seconds   0.0.0.0:32771->9095/tcp, :::32771->9095/tcp   spring
+
+4. sudo docker stop Container_Id(55d19c527df6)
+5. sudo docker rm -f Container_Id(55d19c527df6)
+6. sudo docker rmi -f Image_Id(be3be60d3827)
+
+7. List all open Internet sockets (both listening and non-listening)
+ubuntu@ip-172-31-41-95:~$ lsof -i
+
+8. Kill the process  
+ubuntu@ip-172-31-41-95:~$ kill -9 process_Id
+

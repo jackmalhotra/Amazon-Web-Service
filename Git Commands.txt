@@ -1,0 +1,27 @@
+Setting Username and Email
+git config --global user.name Arjun
+git config --global user.email jackmalhotra56@gmail.com
+
+
+
+git init(initiallised git)
+ls -lart(Shows Hidden files)
+git status
+git add file_name  (To add the files in staged Area)
+git add -A  (TO ADD ALL FILES)
+git add . (TO ADD ALL FILES)
+git commit(To save files)
+git commit -m "Message whatever u want"
+
+if someone changed or done update u want to recover use below
+git checkout filename.extension (Single files)
+git checkout -f (All files to checkout)
+
+
+git branch branch_name (You can create a branch of master)
+git merge branch_name  (First go to master branch and if u want to merge use this one)
+git checkout branch_name (U can jump to specified branch)
+git branch (To check on which branch u r in)
+
+git push origin master(To push your master branch on to the github)
+git clone url (to clone the repository)

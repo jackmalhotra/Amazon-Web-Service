@@ -1,0 +1,53 @@
+********* DOCKER INSTALLATION ON UBUNTU *******************
+
+sudo apt-get update
+sudo apt-get install docker.io
+sudo docker -version
+
+********* OPERATIONS ON DOCKERS ****************************
+
+sudo docker pull image_nam(ubuntu)
+sudo docker images
+sudo docker run --name(conatinername u can give) -it -d jack-linux(image_name)      It will create a container what name u will specified
+sudo docker ps  (WE get container Id)
+sudo docker ps -a (SHOWING ALL EXISTING CONTAINER)
+
+sudo docker exec -it 8107d9d2b26a(Container_Id OR name) bash  (To get into Container)
+sudo docker stop Container_Id  (for Stopping)
+exit (to come outside from container)
+
+sudo docker rm -f Container_Id (remover container from system)
+sudo docker rmi -f Image_Id (To remove Image like ubuntu)
+
+
+sudo docker restart container_name/ID (To restart container)
+docker commit 439be1778307(ImageID Or Container ID) arjunchauhan/jack-linux(new image_name)    To commit save new images
+
+
+********** TO BUILD NEW DOCKER IMAGES WITH APACHE AUTO START WHILE CONTAINER RUN **************
+
+root@ip-172-31-2-142:~# mkdir dockerfile
+root@ip-172-31-2-142:~# cd dockerfile
+root@ip-172-31-2-142:~/dockerfile# nano Dockerfile (Inside Dockerfile 
+
+FROM ubuntu
+RUN apt-get update
+RUN apt-get -y install apache2
+ADD . /var/www/html
+ENTRYPOINT apachectl -D FOREGROUND
+ENV name Intellipath
+
+)
+
+root@ip-172-31-2-142:~/dockerfile# nano 1.html
+root@ip-172-31-2-142:~/dockerfile# docker build . -t new_dockerfile  (To build New Docker Images)
+root@ip-172-31-2-142:~/dockerfile# docker run -it -p 84:80 -d new_dockerfile
+WE will see our new docker Image is created with name new_dockerfile
+
+docker volume create apache(u=volume_name)  Used to create a volume managed by docker
+docker run -it --mount source=apache,target=/var/www/html -d new_dockerfile(IMAGE_NAME)  (Mounting Volume to container)
+docker run --name xyz -p 85:80 -it --mount source=apache,target=/var/www/html -d arjunchauhan/new_docker-image (It will create new container with name xyz)
+
+
+How to create Codepipeline and execute code from git
+https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-simple-codecommit.html

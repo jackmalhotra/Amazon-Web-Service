@@ -1,0 +1,37 @@
+*******Install MySQL on EC2 Instance and connect with workbench********
+
+GO in Ec2 Instance Security group Inbound Edit add new rules MYSQL/Aurora put IPV4 anywhere
+
+sudo apt update
+sudo apt install mysql-server
+sudo systemctl status mysql
+sudo mysql
+
+CREATE USER 'rocky'@'%' IDENTIFIED with mysql_native_password BY 'root@123';
+				OR
+Alter user 'root'@'localhost' IDENTIFIED with mysql_native_password BY 'root@123';
+        
+GRANT ALL ON *.* TO 'rocky'@'%';
+FLUSH PRIVILEGES;
+
+ping Public IPv4 address / 13.232.58.131 
+sudo apt-get install net-tools
+sudo netstat -tuln | grep 3306
+
+If u see output 
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:33060         0.0.0.0:*               LISTEN
+
+change 127.0.0.1 to 0.0.0.0
+sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
+1. press i (for edit)
+2. press esc 
+3. press Shift + :
+4. write wq!
+5. Enter
+
+sudo service mysql restart
+sudo netstat -tuln | grep 3306
+tcp        0      0 0.0.0.0:3306            0.0.0.0:*               LISTEN
+
+Its Working fine now 

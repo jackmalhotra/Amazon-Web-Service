@@ -1,0 +1,44 @@
+*********** Install jenkins on Ubuntu instance ***************
+
+Goto this Link for reference https://pkg.jenkins.io/debian-stable/
+
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install fontconfig openjdk-17-jre
+sudo apt-get install jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+
+ipv4:8080
+
+sudo cat copypaste
+
+******* Jenkins Web Credientials ********
+Username : admin-jenkins
+Password: Rocky123
+
+1. Install jenkins
+2. Install Docker
+
+******* Perform below commands before giving build ***********
+1. sudo cat /etc/passwd | grep jenkins
+2. sudo usermod -aG docker jenkins (Add Jenkins to Docker Group)
+3. Change sock permission : ubuntu@ip-172-31-41-95:~$ sudo chmod 777 /var/run/docker.sock
+4. sudo systemctl restart jenkins  (Restart Jenkins Service) 
+5. groups jenkins
+
+
+*********** Do configuaration on Jenkins Web *******************
+In Jenkins -> manage jenkins -> Install docker Pipeline
+Store Docker credientials ->  Manage Jenkins -> credientials -> Global -> Add Crediential
+kind->Username and Password
+Give Username and Password
+Give Id (ID will be used in pipeline)
+Click create
+

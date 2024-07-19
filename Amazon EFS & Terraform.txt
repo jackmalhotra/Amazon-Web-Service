@@ -1,0 +1,27 @@
+AWS 
+Amazon EFS(Amazon File System)
+Shared Volume
+
+ubuntu@ip-172-31-14-148:~$ sudo apt-get install updates
+ubuntu@ip-172-31-14-148:~$ sudo apt-get install nfs-common
+ubuntu@ip-172-31-14-148:~$ mkdir EFSDemo
+ubuntu@ip-172-31-14-148:~$ sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bd469425d8fd4805.efs.ap-northeast-1.amazonaws.com:/ EFSDemo
+ubuntu@ip-172-31-14-148:~/EFSDemo$ cd EFSDemo
+ubuntu@ip-172-31-14-148:~/EFSDemo$ ls
+ubuntu@ip-172-31-14-148:~/EFSDemo$ sudo touch 1.txt
+ubuntu@ip-172-31-14-148:~/EFSDemo$ sudo touch demo.java
+
+ubuntu@ip-172-31-5-103:~$ sudo apt-get install updates
+ubuntu@ip-172-31-5-103:~$ sudo apt-get install nfs-common
+ubuntu@ip-172-31-5-103:~$ mkdir EFSDemo1
+ubuntu@ip-172-31-5-103:~$ sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bd469425d8fd4805.efs.ap-northeast-1.amazonaws.com:/ EFSDemo
+ubuntu@ip-172-31-5-103:~/EFSDemo1$ cd EFSDemo1
+ubuntu@ip-172-31-5-103:~/EFSDemo1$ ls
+ubuntu@ip-172-31-5-103:~/EFSDemo1$ sudo touch 1.txt
+ubuntu@ip-172-31-5-103:~/EFSDemo1$ sudo touch demo.java
+
+###############TERRAFORM############################
+1. terraform init (The terraform init command will initialize the working directory containing Terraform configuration files and install any required plugins.)
+2. terraform plan (The terraform plan command creates an execution plan, which lets you preview the changes that Terraform plans to make to your infrastructure. By default, when Terraform creates a plan it: Reads the current state of any already-existing remote objects to make sure that the Terraform state is up-to-date)
+3. terraform apply (performs a plan just like terraform plan does, but then actually carries out the planned changes to each resource using the relevant infrastructure provider's API.)
+4. terraform Destroy(terraform destroy command terminates resources managed by your Terraform project)

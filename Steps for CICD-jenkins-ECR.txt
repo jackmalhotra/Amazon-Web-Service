@@ -1,0 +1,153 @@
+1. Configure Ec2
+
+2. Install java
+sudo apt install openjdk-17-jre
+3. Install jenkins
+
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+-> Run Jenkins on browser <instance_ip>:8080
+sudo cat <paste>
+
+******* Jenkins Web Credientials ********
+Username : admin-jenkins
+Password: Rocky123
+
+4. You may also need to setup aws Credentials in jenkins so that it faclilitates the
+Docker push to the ECR repository
+
+manage jenkins->credientials->add credientials
+kind ->Username and password
+Username->aws username
+password->aws password
+ID->aws_ID
+
+5. Install Docker
+sudo apt install docker.io
+	1. sudo cat /etc/passwd | grep jenkins
+	2. sudo usermod -aG docker jenkins (Add Jenkins to Docker Group)
+	3. Change sock permission : ubuntu@ip-172-31-41-95:~$ sudo chmod 777 /var/run/docker.sock
+	4. sudo systemctl restart jenkins  (Restart Jenkins Service) 
+	5. groups jenkins
+
+After installing docker lets restart jenkins
+sudo systemctl restart jenkins
+
+6. Install plugins in jenkins
+	1. Docker
+	2. Docker pipeline
+	3. Amazon ECR
+
+7. Installation of awscli on Ec2 
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt install unzip
+unzip awscliv2.zip
+sudo ./aws/install 
+
+8. Create ECR repository
+
+9. Create IAM Role
+Go to IAM -> Role -> Create Role
+Attach permission policies : AmazonEC2ContainerRegistryFullAccess
+Create it
+Come to instance select instance -> Action -> Security->Modify IAM -> Select role
+
+10. Create Jenkins Jobs and pipeline Scripts
+
+	pipeline {
+		agent any
+		tools {
+			maven '3.9.8'
+		}
+		
+		environment {
+			//DOCKER_IMAGE = 'springboot_app'  // Docker Hub repository name
+			WORKSPACE = '/var/lib/jenkins/workspace/SpringBoot-CICD/'
+			AWS_ACCOUNT_ID = '730335202615'
+			AWS_DEFAULT_REGION = 'ap-south-1'
+			IMAGE_REPO_NAME = 'ecr-springboot'
+			IMAGE_TAG = 'latest'
+			REPOSITORY_URI = "730335202615.dkr.ecr.ap-south-1.amazonaws.com/${IMAGE_REPO_NAME}"
+		}
+
+		stages {
+			stage('1. Code Checkout and Build') {
+				steps {
+					echo "Checking out code and building Maven project"
+					git url: "https://github.com/jackmalhotra/SpringDemo.git", branch: "master"
+					sh "mvn clean install"
+				}
+			}
+			
+			stage('2. Build Docker Image') {
+				steps {
+					echo "Building Docker image"
+					dir("${WORKSPACE}") {
+						sh "docker build -t ${REPOSITORY_URI}:${IMAGE_TAG} ."
+					}
+				}
+			}
+			
+			
+			stage('3. AWS ECR Login') {
+				steps {
+					script {
+						sh """aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"""
+					}
+				}
+			}
+			
+			stage('4. Build and Push to AWS ECR') {
+				steps {
+					echo 'pushing Docker image to AWS ECR...'
+					script {
+						sh "docker push ${REPOSITORY_URI}:${IMAGE_TAG}"
+					}
+				}
+			}
+		}
+
+		post {
+			success {
+				echo 'Pipeline succeeded! Docker image pushed to ECR Repository.'
+			}
+			failure {
+				echo 'Pipeline failed. Deployment unsuccessful.'
+			}
+		}
+	}
+
+11 . pull images from ECR and run as a container
+	1. Login-in to ECR from Ec2
+ubuntu@ip-172-31-36-119:~$ aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 730335202615.dkr.ecr.ap-south-1.amazonaws.com
+	2. pull ecr-images
+ubuntu@ip-172-31-36-119:~$ docker pull 730335202615.dkr.ecr.ap-south-1.amazonaws.com/ecr-springboot:latest
+	3. Run 
+ubuntu@ip-172-31-36-119:~$ docker run -d -P 730335202615.dkr.ecr.ap-south-1.amazonaws.com/ecr-springboot:latest
+	4. check port on which it was running
+ubuntu@ip-172-31-36-119:~$ docker container ls
+
+ubuntu@ip-172-31-36-119:~$ docker images
+ubuntu@ip-172-31-36-119:~$ docker ps -a
+ubuntu@ip-172-31-36-119:~$ sudo docker stop Container_Id(55d19c527df6) (for Stopping)
+ubuntu@ip-172-31-36-119:~$ sudo docker restart container_name/ID (To restart container)
+ubuntu@ip-172-31-36-119:~$ sudo docker exec -it 8107d9d2b26a(Container_Id OR name) bash  (To get into Container)
+ubuntu@ip-172-31-36-119:~$ exit (to come outside from container)
+ubuntu@ip-172-31-36-119:~$ docker commit 439be1778307(ImageID Or Container ID) arjunchauhan/jack-linux(new image_name)    To commit save new images
+ubuntu@ip-172-31-36-119:~$ sudo docker rm -f Container_Id(55d19c527df6)
+ubuntu@ip-172-31-36-119:~$ sudo docker rmi -f Image_Id(be3be60d3827)
+
+12. List all open Internet sockets (both listening and non-listening)
+ubuntu@ip-172-31-36-119:~$ lsof -i
+
+13. Kill the process  
+ubuntu@ip-172-31-36-119:~$ kill -9 process_Id
